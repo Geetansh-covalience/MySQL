@@ -231,3 +231,100 @@ It copies both the structure (columns) and the data (rows).
 The new table will not include constraints like primary keys, foreign keys, indexes, or default values.
 It only creates the columns that were selected, and copies the data.
 
+
+
+
+
+
+
+
+
+
+
+
+ALL	            TRUE if all of the subquery values meet the condition	
+AND	            TRUE if all the conditions separated by AND is TRUE	
+ANY	            TRUE if any of the subquery values meet the condition	
+BETWEEN	        TRUE if the operand is within the range of comparisons	
+EXISTS	        TRUE if the subquery returns one or more records	
+IN	            TRUE if the operand is equal to one of a list of expressions	
+LIKE	        TRUE if the operand matches a pattern	
+NOT	            Displays a record if the condition(s) is NOT TRUE	
+OR	            TRUE if any of the conditions separated by OR is TRUE	
+SOME	        TRUE if any of the subquery values meet the condition
+
+
+
+
+
+
+
+
+ALTER COMMAND 
+==============
+-- 1. Add a new column
+ALTER TABLE Employees
+ADD gender CHAR(1);
+
+-- 2. Add a new constraint (example: CHECK constraint)
+ALTER TABLE Employees
+ADD CONSTRAINT chk_gender CHECK (gender IN ('M', 'F'));
+
+-- 3. Drop a column
+ALTER TABLE Employees
+DROP COLUMN phone_number;
+
+-- 4. Rename a column
+ALTER TABLE Employees
+RENAME COLUMN salary TO base_salary;
+
+-- 5. Modify column data type
+ALTER TABLE Employees
+MODIFY base_salary DECIMAL(12, 2);
+
+-- 6. Drop a constraint
+ALTER TABLE Employees
+DROP CONSTRAINT chk_gender;
+
+-- 7. Rename the table
+ALTER TABLE Employees
+RENAME TO Staff;
+
+
+
+
+
+Constraints
+============
+
+CREATE TABLE Employees (
+    employee_id INT PRIMARY KEY,                          -- Unique and NOT NULL
+    first_name VARCHAR(50) NOT NULL,                      -- Cannot be null
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE,                            -- Must be unique
+    phone_number VARCHAR(15),
+    hire_date DATE DEFAULT CURRENT_DATE,                  -- Default value
+    salary DECIMAL(10, 2) CHECK (salary >= 0),            -- Must be non-negative
+    department_id INT,
+    CONSTRAINT fk_department FOREIGN KEY (department_id)  -- Foreign key
+    REFERENCES Departments(department_id)
+);
+
+
+
+
+
+
+
+
+
+
+Type	                    Use Case	                                                    Example
+Single-Column Index	        A single column for fast search.	                            CREATE INDEX idx_name ON Employees(Name);
+Composite Index	            Multiple columns to speed up queries.	                        CREATE INDEX idx_name_age ON Employees(Name, Age);
+Unique Index	            Ensures no duplicate values in a column.	                    CREATE UNIQUE INDEX idx_email ON Employees(Email);
+Full-Text Index	            Efficient text searching in large text fields.	                CREATE FULLTEXT INDEX idx_desc ON Articles(Description);
+Clustered Index	            Sorts data rows physically in table.	                        CREATE CLUSTERED INDEX idx_salary ON Employees(Salary);
+Non-Clustered               Index	Separate structure, does not affect data storage.	    CREATE NONCLUSTERED INDEX idx_department ON Employees(Department);
+Bitmap Index	            Low-cardinality columns with limited distinct values.	        CREATE BITMAP INDEX idx_gender ON Employees(Gender);
+Hash Index	                Exact match queries using hash values.	                        CREATE INDEX idx_id_hash ON Employees(EmployeeID) USING HASH;
