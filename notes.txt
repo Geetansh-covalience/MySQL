@@ -1,0 +1,233 @@
+Aspect	                            MySQL (Relational DB)	                                                            NoSQL (Non-relational DB)
+=========================================================================================================================================================================================
+Data Structure	                    Tables with rows and columns	                                                    JSON-like documents, key-value pairs, graphs, or wide-columns
+Schema	                            Schema is rigid and must be defined before inserting data	                        Schema is dynamic; different documents can have different fields
+Change in Structure	                You must ALTER TABLE to add/remove columns	                                        You can just add new fields in documents anytime
+Joins	                            Supports JOINs for complex relations across tables	                                Typically doesn’t support joins (except some like MongoDB 3.2+)
+Use Case:                           E-commerce	Best for orders, inventory, and transactions	                        Best for storing product reviews or user preferences
+Use Case:                           Banking System	Excellent for ACID transactions, account balance updates	        Not suitable for systems requiring strong consistency
+Use Case:                           IoT Data	                                                                        Perfect for handling time-series or sensor data (e.g., InfluxDB)
+Scalability	                        Vertical scaling (upgrade server hardware)	                                        Horizontal scaling (add more servers)
+Performance for Reads/Writes	    Great for complex queries and structured reads	                                    Excellent for large-scale inserts and simple reads
+Storage Overhead	                Normalized data = less redundancy but complex queries	                            Denormalized = more redundancy but faster retrieval
+Example Use Case:                   Social Media User relationships in MySQL (users, friends, likes tables)	            Use graph DB (like Neo4j) for friend-of-a-friend, recommendations
+
+
+
+
+
+
+
+Industry	                    Use Case	                                            Preferred DB	                            Why?
+=====================================================================================================================================================================================================
+Finance/Banking	                Account balances, transactions, audit logs	            MySQL / PostgreSQL	                        ACID-compliant, strong consistency, transactional support
+Social Media	                Posts, comments, likes, relationships	                NoSQL (MongoDB, Neo4j)	                    Handles unstructured data, graph relationships
+Retail/E-commerce	            Inventory, product catalog, order tracking	            Mixed (MySQL + MongoDB)	                    MySQL for orders, NoSQL for flexible product details
+IoT/Telemetry	                Sensor data, logs, device metrics	                    NoSQL (InfluxDB, Cassandra)	                High write throughput, time-series support
+Real-Time Chat	                Messages, user presence	                                NoSQL (Redis, Firebase)	                    In-memory speed, real-time updates
+Blog/Content Sites	            Articles, tags, comments	                            NoSQL (MongoDB)	                            Flexible schema for evolving content
+ERP Systems	                    Invoices, procurement, HR	                            MySQL / Oracle	                            Complex structured data and business rules
+Healthcare	                    Patient records, prescriptions, appointments	        MySQL + NoSQL (hybrid)	                    Secure transactions + flexible patient metadata
+
+
+
+
+
+
+
+
+
+
+DDL	            DML	            DCL	            TCL
+===========================================================
+CREATE	        SELECT	        GRANT	        BEGIN
+ALTER	        INSERT	        REVOKE	        COMMIT
+DROP	        UPDATE	        DENY	        ROLLBACK
+TRUNCATE	    DELETE	        AUDIT	        SAVEPOINT
+RENAME	        MERGE	        NOAUDIT	        RELEASE
+
+
+
+
+
+
+
+
+
+Why TRUNCATE is DDL, Not DML
+=============================
+The key reason TRUNCATE is classified as DDL (Data Definition Language) and DELETE is classified as DML (Data Manipulation Language) lies in how they interact with the database structure:
+
+Structural vs. Data Operation:
+------------------------------
+TRUNCATE: A DDL command operates at the schema level, meaning it does not simply remove data but also involves modifying the internal structure of the table to deallocate the data pages. It acts more like redefining the table’s data.
+DELETE: A DML command works at the data level. It manipulates the data rows in the table and does not affect the table structure. It is a part of data manipulation rather than schema modification.
+
+
+Logging Behavior:
+-----------------
+TRUNCATE: It does not log each individual row deletion; it only logs the deallocation of data pages. As a result, it's faster but also less flexible for transactions.
+DELETE: Each row deletion is logged individually, meaning it can be rolled back and is more suitable for row-by-row operations (even if you delete all rows).
+
+
+Impact on Triggers and Constraints:
+------------------------------------
+TRUNCATE: Does not fire triggers because it's considered a structural operation, and constraints like foreign keys may prevent it if the table is referenced elsewhere.
+DELETE: Fires triggers (if any are defined) for each row deleted and does not require any foreign key constraints to be dropped.
+
+
+Rollback and Transactions:
+--------------------------
+TRUNCATE is less transactional because, while some databases may allow rolling it back, it is typically treated as a permanent operation (like dropping a table) when committed.
+DELETE allows for full transaction control with rollback functionality in most systems.
+
+
+
+
+
+
+
+
+
+
+
+Character Data Types:
+======================
+CHAR: Stores fixed-length strings. The length of the string is specified when creating the column. It's padded with spaces if the string is shorter than the specified length.
+VARCHAR: Stores variable-length strings. You specify the maximum length, but it only uses the amount of space required to store the string.
+TEXT: Used for large text strings, such as articles, descriptions, or comments. It can store much larger amounts of data than VARCHAR.
+
+
+Numeric Data Types:
+==================
+INT: Used to store integers. Typically used for primary keys, counters, or age.
+FLOAT: Stores floating-point numbers with single precision.
+DOUBLE: Stores floating-point numbers with double precision (higher precision than FLOAT).
+DECIMAL or NUMERIC: Used for fixed-point numbers, commonly used for monetary values where precision is important
+
+
+Date and Time Data Types:
+=========================
+DATE: Stores a date value (YYYY-MM-DD). Common for birthdates, hire dates, or event dates.
+TIME: Stores a time value (HH:MM:SS). Useful for events or transactions that happen at specific times.
+DATETIME: Stores both date and time values (YYYY-MM-DD HH:MM:SS). Useful for logging timestamps of actions or events.
+TIMESTAMP: Stores both date and time with automatic updating when the row is modified.
+
+
+Boolean Data Type:
+==================
+BOOLEAN: Stores either TRUE or FALSE. Often used for binary data, such as flags or yes/no options.
+
+
+Binary Data Types:
+==================
+BLOB (Binary Large Object): Used for storing large binary data such as images, audio, or video.
+VARBINARY: Stores binary data with a variable length, useful for storing files or encrypted data.
+
+
+
+
+
+
+
+
+*****
+LIMIT 9             =>      first 9 records
+LIMIT 9,4           =>      4 records start from 9
+LIMIT 9 OFFSET 4    =>      9 records start from 5 
+
+
+
+
+
+
+
+JOINs 
+======
+
+left            =>      common + left
+right           =>      right + common
+inner           =>      only common
+self            =>      join with same table like for manager and employee tables
+cross           =>      cartesian product of two tables aXb
+full outer      =>      left join union right join
+
+
+
+
+
+
+
+JOIN Type	        NULLs in Result?	        Why?
+=======================================================================
+INNER JOIN	        ❌ No	                  Only matching rows are returned
+LEFT JOIN	        ✅ Yes (Right side)	      Left rows kept even if no right match
+RIGHT JOIN	        ✅ Yes (Left side)	      Right rows kept even if no left match
+FULL OUTER JOIN	    ✅ Yes (Both sides)	      Shows unmatched rows from both tables
+CROSS JOIN	        ❌ No	                  Every combination is returned — no match needed
+SELF JOIN	        ✅ If no match	          NULLs if no matching reference within the same table
+
+
+
+
+
+
+
+UNION VS UNION ALL 
+=========================
+The UNION operator selects only distinct values by default. To allow duplicate values, use UNION ALL
+
+------------------
+Every SELECT statement within UNION must have the same number of columns
+The columns must also have similar data types
+The columns in every SELECT statement must also be in the same order
+
+
+
+
+
+
+
+
+
+ONE QUERY WHICH INCLUDES => JOIN,HAVING,LIMIT,WHERE,GTOUP BY, ORDER BY 
+SELECT 
+    c.customer_id,
+    c.name,
+    SUM(o.amount) AS total_spent
+FROM 
+    customers c
+JOIN 
+    orders o ON c.customer_id = o.customer_id
+WHERE 
+    c.country = 'USA' AND o.status = 'complete'
+GROUP BY 
+    c.customer_id, c.name
+HAVING 
+    total_spent > 600
+ORDER BY 
+    total_spent DESC
+LIMIT 2;
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE TestTable AS
+SELECT customername, contactname
+FROM customers;
+====================================
+Create a new table named TestTable.
+Copy specific columns (customername, contactname) from the existing customers table into TestTable.
+It copies both the structure (columns) and the data (rows).
+🧠 Important Notes:
+The new table will not include constraints like primary keys, foreign keys, indexes, or default values.
+It only creates the columns that were selected, and copies the data.
+
