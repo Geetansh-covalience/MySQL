@@ -328,3 +328,230 @@ Clustered Index	            Sorts data rows physically in table.	               
 Non-Clustered               Index	Separate structure, does not affect data storage.	    CREATE NONCLUSTERED INDEX idx_department ON Employees(Department);
 Bitmap Index	            Low-cardinality columns with limited distinct values.	        CREATE BITMAP INDEX idx_gender ON Employees(Gender);
 Hash Index	                Exact match queries using hash values.	                        CREATE INDEX idx_id_hash ON Employees(EmployeeID) USING HASH;
+
+
+
+
+
+sysdate vs current_timestamp;
+=============================
+
+in sysdate the time will change after every sec like select sysdate sleep(1000) sysdate both time will be different
+but in case of current_timestamp it will same 
+
+select sysdate,current_timestamp;
+sleep(10000)
+select sysdate,current_timestamp;
+
+HERE TIME WILL CHANGE IN BOTH CASES
+
+
+
+DATE FUNCTIONS
+===============
+day("date") => return day of that date
+SELECT ADDDATE("2017-06-15", INTERVAL 10 YEAR); => add 10 years, otehr values can be hour minute second    
+extract(hour/minute/date... from date);
+
+
+
+***************
+CURRENT_TIMESTAMP (Server's UTC time):
+server time => 10:30:00;
+
+Server ka time UTC hoga. Agar server UTC pe hai, toh user ko UTC time dikhayi dega.
+Example output: 2025-04-16 10:30:00 (UTC)
+LOCALTIMESTAMP (User's local time - IST):
+User's local time ko adjust karke IST time dikhayi dega.
+Example output: 2025-04-16 15:00:00 (IST)
+
+
+
+
+ifNull vs coalesce
+==================
+if null will replace default value if find null
+coalesce will return first not null value from multiple attributes
+
+
+
+CURRENT_USER();
+==============
+return current user
+
+
+
+
+
+INDEX,VIEWS,PROCEDURES,TRIGGERS
+===============================
+CREATE INDEX index_name ON table_name (column_name);
+CREATE VIEW viewname as (query)
+
+
+
+
+1.SIMPLE PROCEDURE
+=================
+CREATE PROCEDURE GreetUser()
+BEGIN
+    SELECT 'Hello, this is a simple procedure!' AS message;
+END $$
+CALL GreetUser();
+
+
+2.PROCEDURE WITH INPUT
+=======================
+CREATE PROCEDURE GreetUser(IN name VARCHAR(50))
+BEGIN
+    SELECT CONCAT('Hello, ', name, '!') AS greeting;
+END $$
+CALL GreetUser('Amit');
+
+
+3.PROCEDURE WITH OUTPUT
+=======================
+CREATE PROCEDURE add_num(OUT result INT)
+BEGIN
+    SET result += 2;
+END $$
+SET @varName = 2;
+CALL add_num(@varName);
+SELECT @varName;
+
+
+4.PROCEDURE WITH INOUT
+=======================
+CREATE PROCEDURE add_num(OUT result INT)
+BEGIN
+    SET result = 2;
+END $$
+CALL add_num(@varName);
+SELECT @varName;
+
+
+5.PROCEDURE WITH DECLARE VARIABLES
+==================================
+CREATE PROCEDURE triple(IN id INT)
+BEGIN
+    DECLARE empDetails VARCHAR(25);
+    SELECT emp_name INTO empDetails FROM emp WHERE emp_id = id;
+    SELECT CONCAT('Employee Name is: ', empDetails) AS Result;
+END $$
+
+
+6.PROCEDURE WITH IF ELSE
+==================================
+CREATE PROCEDURE triple(IN id INT)
+BEGIN
+    DECLARE empDetails VARCHAR(25);
+    SELECT emp_name INTO empDetails FROM emp WHERE emp_id = id;
+    SELECT CONCAT('Employee Name is: ', empDetails) AS Result;
+END $$
+
+
+7. PROCEDURE WITH LOOPS
+=======================
+DELIMITER $$
+CREATE PROCEDURE print_while(IN n INT)
+BEGIN
+    DECLARE i INT DEFAULT 1;
+
+    WHILE i <= n DO
+        SELECT i AS number;
+        SET i = i + 1;
+    END WHILE;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE print_repeat(IN n INT)
+BEGIN
+    DECLARE i INT DEFAULT 1;
+
+    REPEAT
+        SELECT i AS number;
+        SET i = i + 1;
+    UNTIL i > n
+    END REPEAT;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sum_upto(IN n INT)
+BEGIN
+    DECLARE total INT DEFAULT 0;
+
+    sum_loop: LOOP
+        IF n <= 0 THEN
+            LEAVE sum_loop;
+        END IF;
+
+        SET total = total + n;
+        SET n = n - 1;
+    END LOOP sum_loop;
+
+    SELECT total AS SumOfNumbers;
+END $$
+DELIMITER ;
+
+
+
+DROP PROCEDURE IF EXISTS procedure_name;
+show procedure status where db = "demo";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Indexing
+=========
+
+
+1. NONCLUSTERED INDEXING => FOR FAST retrieval AS IT CRATESA DIFFERENT STRUCTRUE HAVING POINTERS
+=================================================================================================
+CREATE INDEX index_name ON table_name(column,column1)
+
+2. FULLTEXT INDEXING
+====================
+create fulltext index index_name on emp(emp_email);
+
+
+show indexes from table_name;
+drop index index_name on table_name
+
+
+
+
+
+
+
+
+
+
+
+
+
+TRIGGERS
+=========
+CREATE TRIGGER trigger_name
+trigger_time trigger_event
+ON table_name
+FOR EACH ROW
+trigger_body;
+
+
+trigger_name: Trigger ka naam.
+trigger_time: Jab trigger execute hoga. Yeh BEFORE ya AFTER ho sakta hai.
+trigger_event: Jo event trigger karega (INSERT, UPDATE, DELETE).
+table_name: Table jisme trigger apply hoga.
+trigger_body: Wo SQL statements jo trigger execute karega.
