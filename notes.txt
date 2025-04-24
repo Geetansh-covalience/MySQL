@@ -40,6 +40,7 @@ Healthcare	                    Patient records, prescriptions, appointments	    
 
 DDL	            DML	            DCL	            TCL
 ===========================================================
+
 CREATE	        SELECT	        GRANT	        BEGIN
 ALTER	        INSERT	        REVOKE	        COMMIT
 DROP	        UPDATE	        DENY	        ROLLBACK
@@ -541,6 +542,7 @@ drop index index_name on table_name
 
 
 
+
 TRIGGERS
 =========
 CREATE TRIGGER trigger_name
@@ -555,3 +557,145 @@ trigger_time: Jab trigger execute hoga. Yeh BEFORE ya AFTER ho sakta hai.
 trigger_event: Jo event trigger karega (INSERT, UPDATE, DELETE).
 table_name: Table jisme trigger apply hoga.
 trigger_body: Wo SQL statements jo trigger execute karega.
+
+
+
+
+
+
+
+**************
+Types of indexes
+================
+primary, unique, non-unique/normal, spatial => geographical, Composite, foreign key => referential integrity
+
+
+
+STORAGE ENGINE
+=-=-=-=-=-=-=-
+Storage engine ek plugin system hai MySQL ka, jo batata hai:
+Data kaise store hoga disk pe
+Transactions support honge ya nahi
+Indexes kaise handle honge
+Locking mechanism kya hoga (row-level vs table-level)
+
+MyISAM 
+pros => Read operations ke liye super fast
+cons => no support for transaction, no foreign keys, ek user likh raha ho toh doosra wait karega 
+
+InnoDB 
+pros => acid prop, commit/rollback foreign key
+cons => slower than myISAM and more usage
+
+memory
+pros => superfast - stored in ram , best for temp tables
+cons => Data volatile – server restart = sab gayab
+
+csv
+pros => data stored as csv files, easily import/export
+cons => no indexing, not for production
+
+
+
+
+
+
+
+
+🔹 1. Functionality / Usage
+DELETE is used when we want to remove specific rows from a table based on a condition.
+TRUNCATE is used to quickly remove all rows from a table — it's like a reset.
+🧠 Logic:
+Use DELETE when you need control (e.g. delete only old records),
+and TRUNCATE when you want to clear the table completely.
+
+🔹 2. WHERE Clause
+DELETE supports WHERE clause → allows conditional deletion.
+TRUNCATE does not support WHERE → deletes everything.
+🧠 Logic:
+DELETE is flexible, TRUNCATE is blunt.
+
+🔹 3. Transaction & Rollback
+DELETE is DML (Data Manipulation Language) → fully transactional. Can be rolled back.
+TRUNCATE is DDL (Data Definition Language) → behaves like a table re-creation, rollback not guaranteed (depends on storage engine, e.g. InnoDB supports it).
+🧠 Logic:
+Use DELETE in critical operations where rollback is a must.
+
+🔹 4. Performance / Speed
+DELETE deletes rows one by one, logging each row → slow for large datasets.
+TRUNCATE just deallocates the data pages, no per-row logging → much faster.
+🧠 Logic:
+TRUNCATE is preferred for performance when you don't need to track individual row deletions.
+
+🔹 5. AUTO_INCREMENT Reset
+DELETE does not reset AUTO_INCREMENT counter.
+TRUNCATE resets it to zero (or starting value).
+🧠 Logic:
+Use TRUNCATE when you want a clean slate, including fresh IDs.
+
+🔹 6. Triggers
+DELETE fires triggers (e.g. BEFORE DELETE, AFTER DELETE).
+TRUNCATE does not fire any triggers.
+🧠 Logic:
+Use DELETE when your logic depends on trigger-based actions.
+
+
+
+
+
+
+
+
+
+GRANT SELECT,INSERT ON database_name.* to 'username'@'localhost'
+
+
+DATETIME: If User 1 in India inserts a date, and User 2 in the USA fetches it,
+User 2 will see the exact same time as it was entered by User 1,
+without any time zone conversion. 
+This might lead to confusion because the times will be interpreted differently
+depending on their local time zones.
+
+TIMESTAMP: If User 1 in India inserts a date, and User 2 in the USA fetches it, 
+the time will be converted to UTC when stored, 
+and then converted back to User 2’s local time (USA time zone) when they retrieve it. 
+This ensures that the same moment in time is reflected correctly for both users,
+ adjusted for their respective time zones.
+
+
+
+
+
+ROLLBACK TO SAVEPOINT savepoint_name;
+
+
+Order Matters: Composite index mein columns ka order important hai. Agar aap query mein pehle 
+Department filter karte ho aur baad mein JoinDate, toh yeh index efficiently work karega.
+Composite Index aapke multi-column queries ko optimize karta hai.
+Index Columns ka Order aur Query ke Type par yeh kaafi depend karta hai.
+Agar aapko performance boost chahiye aur aap multiple columns ko query karte ho, toh composite index helpful ho sakta hai.
+
+
+
+no server affect
+================
+ADDDATE => ADDDATE(date, 1month/1 year/1 day)
+SUBDATE => ADDDATE(date, 1month/1 year/1 day)
+ADDTIME => ADDDATE(date, 1 Hour/1 minute/1 second)
+TIMEDIFF("12:19:10", "12:15:37")
+
+server affect
+=============
+CURRENT_TIMESTAMP/CURRENT_DATE/CURRENT_TIME
+SYSDATE
+
+
+
+NOW VS SYSDATE
+==============
+SELECT NOW() AS Now_Timestamp, SYSDATE() AS SysDate_Timestamp;
+SELECT SLEEP(5);  -- Pauses execution for 5 seconds
+SELECT NOW() AS Now_After_Sleep, SYSDATE() AS SysDate_After_Sleep;
+
+
+iss case mein now dono jagah same time dega but in case of sysdate ye alag alag dega

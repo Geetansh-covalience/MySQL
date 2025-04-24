@@ -1,0 +1,24 @@
+{
+  "name": "mysql",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000M\u0000y\u0000S\u0000Q\u0000L\u0000\r\u0000 \u0000",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Geetansh-covalience/MySQL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Geetansh-covalience/MySQL/issues"
+  },
+  "homepage": "https://github.com/Geetansh-covalience/MySQL#readme",
+  "dependencies": {
+    "mysql2": "^3.14.0",
+    "sequelize": "^6.37.7"
+  }
+}
